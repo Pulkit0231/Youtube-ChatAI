@@ -5,7 +5,8 @@
     "description": "A chat assistant for YouTube videos.",
     "permissions": [
         "activeTab",
-        "storage"
+        "storage",
+        "scripting"
     ],
     "background": {
         "service_worker": "background.js"
@@ -17,6 +18,9 @@
             ],
             "js": [
                 "contentScript.js"
+            ],
+            "css": [
+                "styles.css"
             ]
         }
     ],
