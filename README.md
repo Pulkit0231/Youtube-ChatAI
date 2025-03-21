@@ -26,10 +26,10 @@ youtube-chatai-assistant
 
 
 ## Setup
-Backend Server
-1. Navigate to the "server" directory:
 
-    cd server
+1. Navigate to the "Main" directory:
+
+    cd Youtube-ChatAI
 2. Install the required npm packages:
 
      npm install
