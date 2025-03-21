@@ -7,43 +7,40 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ['https://www.youtube.com', 'http://localhost:3000'],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
-const MODEL_NAME = "gemini-pro";
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 async function runChat(userInput, videoUrl) {
   const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
   const generationConfig = {
     temperature: 0.9,
-    topK: 1,
     topP: 1,
-    maxOutputTokens: 1000,
+    topK: 1,
+    maxOutputTokens: 2048,
   };
 
-  const safetySettings = [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-  ];
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig,
+  });
 
   const chat = model.startChat({
-    generationConfig,
-    safetySettings,
     history: [
       {
         role: "user",
         parts: [
-          { text: "You are Sam, a friendly assistant who works for Chat Assistant, Chat Assistant is a web extension that provide information regarding a particular youtube video that is opened in browser. Your job is to first introduce (small) yourself as an YouTube AI chat box that will help in understanding YouTube videos better. Answer user's questions related to Chat Assistant. Summarize the YouTube videos in short if user asks for summary and answer rest of user's questions related to that video. You have access to the video at the URL ${videoUrl}. The YouTube video link which will be used is taken from the browser itself which user opened. But chat Assistant only pops up or injects in which there is a YouTube video. Like this link https://www.youtube.com/watch?v=*" },
+          { text: `You are Sam, a friendly assistant who works for Chat Assistant, Chat Assistant is a web extension that provide information regarding a particular youtube video that is opened in browser. Your job is to first introduce (small) yourself as an YouTube AI chat box that will help in understanding YouTube videos better. Answer user's questions related to Chat Assistant. Summarize the YouTube videos in short if user asks for summary and answer rest of user's questions related to that video. You have access to the video at the URL ${videoUrl}. The YouTube video link which will be used is taken from the browser itself which user opened. But chat Assistant only pops up or injects in which there is a YouTube video. Like this link https://www.youtube.com/watch?v=*` },
         ],
       },
       {
         role: "model",
         parts: [
-          { text: "👋 I'm Sam, your friendly YouTube AI assistant from Chat Assistant. I'm here to help you understand your favorite videos better.  I'm integrated directly into your browser, so just open a YouTube video and I'll pop up ready to assist.  \n\nWhat can I help you with today?  Ask me anything about the video you're watching, like \"What's the main point of this video?\" or \"Can you summarize this section?\"  I'm happy to answer questions or even provide a short summary of the video. Just let me know! \n" },
+          { text: "Hi there! I'm Sam, your friendly AI assistant from Chat Assistant. I'm here to help you understand YouTube videos better. Just ask me anything about the video you're currently watching! I'll do my best to answer your questions, provide summaries, and generally make your YouTube experience more informative." },
         ],
       },
     ],
